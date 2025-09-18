@@ -36,27 +36,215 @@ pip3 install hyphae
 pip install hyphae
 ```
 
-## Getting Started
+# Building Your First Hyphae App: ArXiv Research Assistant
 
-Follow [this tutorial here](GettingStarted/README.md) to make your app, join our [Discord](https://discord.gg/itsalltruffles) for more developer support!
+Welcome to Hyphae, the SDK for building AI agents on TruffleOS! In this tutorial, we'll walk through a complete Hyphae application to teach you the framework, then show you how to build, deploy, and use it yourself.
 
-## Building and Uploading your Hyphae App
+## What You'll Learn
 
-Once you have developed your app, test that it's working and has no issues before building and uploading.
+By the end of this tutorial, you'll understand:
+- How Hyphae agents work and what makes them powerful
+- The core concepts: tools, state, predicates, and workflows
+- How to integrate external APIs and AI services
+- How to build, deploy, and test your own agents
+- How to create your own apps from our template
 
-### Test Your App
+## What We'll Deploy Together
 
-```bash
-python3 your-app-directory/main.py
+We'll explore an ArXiv Research Assistant that demonstrates all key Hyphae concepts:
+- **Multi-source search**: ArXiv API, Semantic Scholar, web search
+- **Stateful workflows**: Select papers and maintain context across conversations
+- **AI-powered analysis**: Get expert insights on selected papers
+- **External integrations**: Multiple APIs and AI services working together
+
+---
+
+## Part 1: Understanding the Code
+
+Let's start by examining a complete Hyphae app to understand how everything works. Open `example_apps/Arxiv/arxiv.py` and follow along.
+
+### The Basics: Imports and Setup
+
+```python
+import hyphae  # The main SDK
+from hyphae.tools.respond_to_user import RespondToUserReturnType
+from perplexity import PerplexitySearcher  # External AI service
+import hyphae.hooks as hooks
 ```
 
-If there are errors, fix them. Also make sure to have all your package requirements added to your Truffle file!
+**Key Concept**: Hyphae apps are Python classes with decorated methods that become "tools" the AI agent can use.
 
-### Connect to Truffle
+### Agent State and Predicates
 
-Connect Hyphae to your Truffle, having your client connected to your Truffle is a prerequisite for this:
+```python
+class ArxivApp:
+    def __init__(self):
+        self.selected_paper = None    # Agent remembers selected paper
+        self.paper_content = None     # Cached content
+        
+    def has_paper_selected(self) -> bool:
+        """Predicate function - controls when tools are available"""
+        return self.selected_paper is not None
+```
+
+**Key Concept**: Agents maintain state across conversations. Predicate functions control when tools are available, creating natural workflows.
+
+### Tool Definitions
+
+```python
+@hyphae.tool("Search for papers on a specific topic", icon="magnifyingglass")
+@hyphae.args(
+    query="The search query (topic, keywords, or title)",
+    max_results="Maximum number of results to return"
+)
+def SearchPapers(self, query: str, max_results: int = 10) -> str:
+    # Tool implementation here...
+```
+
+**Key Concept**: 
+- `@hyphae.tool()` makes a method available to the AI agent
+- `@hyphae.args()` describes parameters so the AI knows how to use the tool
+- Tools return strings that the AI can read and use
+
+### Workflow Design: Search → Select → Analyze
+
+Notice how the app creates a natural workflow:
+
+1. **Search Tools** (always available):
+   - `SearchPapers()` - ArXiv API search
+   - `SearchWebPapers()` - Perplexity AI search
+   - `SearchExternalPapers()` - Semantic Scholar search
+
+2. **Selection Tool** (changes agent state):
+   - `SelectPaper()` - Stores paper data in `self.selected_paper`
+
+3. **Analysis Tools** (only available after selection):
+   - `Researcher()` - AI-powered paper analysis
+   - `GetCurrentPaper()` - View selected paper info
+
+```python
+@hyphae.tool("Researcher - Discuss the selected paper", 
+             predicate=lambda self: self.has_paper_selected())  # Only available when paper selected
+```
+
+**Key Concept**: Predicates create conditional tool access, guiding users through logical workflows.
+
+### External API Integration
+
+The app shows three different integration patterns:
+
+1. **REST API with XML/Atom** (ArXiv):
+```python
+def SearchPapers(self, query: str, max_results: int = 10) -> str:
+    url = f"http://export.arxiv.org/api/query?search_query=all:{quote(query)}"
+    response = requests.get(url)
+    feed = feedparser.parse(response.content)  # Parse XML
+    # Format results as markdown...
+```
+
+2. **REST API with JSON** (Semantic Scholar):
+```python
+def SearchExternalPapers(self, query: str, max_results: int = 10) -> str:
+    url = "https://api.semanticscholar.org/graph/v1/paper/search"
+    response = requests.get(url, params=params)
+    data = response.json()  # Parse JSON
+    # Format results...
+```
+
+3. **External AI Service** (Perplexity):
+```python
+def SearchWebPapers(self, query: str) -> str:
+    search_query = f"academic papers research {query}"
+    return PerplexitySearcher().run(search_query)  # Delegate to external AI
+```
+
+**Key Concept**: Hyphae agents can integrate any external service. The pattern is: call API → format results → return to AI.
+
+### AI-Powered Intelligence
+
+The most sophisticated tool uses AI to provide expert analysis:
+
+```python
+@hyphae.tool("Researcher - Discuss the selected paper with an expert")
+def Researcher(self, question: str, analysis_type: str = "general") -> str:
+    # Build rich context from selected paper
+    paper_info = f"""
+    Paper: {self.selected_paper['title']}
+    Authors: {', '.join(self.selected_paper['authors'])}
+    Abstract: {self.selected_paper['abstract']}
+    """
+    
+    # Create expert prompt
+    researcher_prompt = f"""You are an expert researcher. 
+    User has selected this paper: {paper_info}
+    
+    Answer their question: {question}
+    Focus on {analysis_type} analysis."""
+    
+    # Use external AI for expert response
+    return PerplexitySearcher().run(researcher_prompt)
+```
+
+**Key Concept**: Combine structured data (paper metadata) with AI reasoning to create expert-level capabilities.
+
+---
+
+## Part 2: Building and Deploying Your App
+
+Now let's build and deploy this app so you can see it in action!
+
+### Step 1: Get the Code
 
 ```bash
+git clone https://github.com/deepshard/get-started-with-hyphae.git
+cd get-started-with-hyphae/example_apps/Arxiv
+```
+
+### Step 2: Understand the App Structure
+
+Your app directory contains:
+
+#### `app.json` - App Metadata
+```json
+{
+    "app_uuid": "",
+    "metadata": {
+        "name": "Arxiv Research Assistant",
+        "description": "AI agent for searching and analyzing academic papers",
+        "icon": "arxiv.png"
+    }
+}
+```
+
+#### `Truffile` - Container Definition
+```dockerfile
+FROM hyphaehyphae/alpine-python:arm64
+RUN pip3 install ddgs python-weather pytrends pandas requests feedparser 
+COPY arxiv.py /opt/arxiv/arxiv.py
+RUN pip3 install hyphae
+WORKDIR /opt/arxiv
+CMD ["python3", "/opt/arxiv/arxiv.py"]
+```
+
+#### `arxiv.py` - Your Agent Code
+The Python file we just analyzed above.
+
+#### `perplexity.py` - External Service Helper
+Helper class for Perplexity AI integration.
+
+### Step 3: Build Your App
+
+```bash
+# Build the app into a deployable bundle
+hyphae build .
+```
+
+This creates a `.hyphae` bundle file containing your containerized app.
+
+### Step 4: Deploy to TruffleOS
+
+```bash
+# Connect to your Truffle device
 hyphae connect
 ```
 Open your client and click accept. You are now connected. If it fails or the toast goes away, press `Ctrl+C` and try again.
@@ -65,40 +253,95 @@ Open your client and click accept. You are now connected. If it fails or the toa
   <img src="screenshots/hyphae-connect.png" alt="Hyphae Connect">
 </div>
 
-
-
-### Build Your App
-
+# Upload and deploy your app
 ```bash
-cd your-app-directory
-hyphae build .
-```
-or
-
-```bash
-hyphae build your-app-dir
-```
-
-This will package your app to be uploaded to your Truffle.
-
-### Upload Your App
-
-```bash
-cd your-app-directory
 hyphae upload .
 ```
-or
-
-```bash
-hyphae upload your-app-dir
-```
-
 <div align="center">
   <img src="screenshots/hyphae-upload.png" alt="Hyphae Upload">
 </div>
 
 Your app will start uploading. Go to your client to see a progress indicator. Fresh app uploading takes some time to upload, but subsequent uploads will be faster since they are cached and only update your app.
 
+---
+
+## Part 3: Using Your App
+
+Once deployed, users can interact with your ArXiv Research Assistant through the TruffleOS client.
+
+## Part 4: Create Your Own App
+
+Now that you understand how Hyphae works, let's create your own app! We recommend that you read through our [example apps](example_apps/) to get more context on more hyphae features.
+
+### Step 1: Copy the Template
+
+```bash
+# Create your new app directory
+mkdir my-awesome-app
+cd my-awesome-app
+
+# Copy template files
+cp -r path-to/get-started-with-hyphae/example_apps/Template/* .
+```
+
+### Step 2: Customize Your App
+
+#### Edit `app.json`:
+```json
+{
+    "app_uuid": "",
+    "metadata": {
+        "name": "My Awesome App",
+        "description": "What your app does",
+        "icon": "your-icon.png"
+    }
+}
+```
+
+#### Edit `Truffile`:
+Add your dependencies:
+```dockerfile
+FROM hyphaehyphae/alpine-python:arm64
+RUN pip3 install your-dependencies-here
+COPY main.py /opt/app/main.py
+RUN pip3 install hyphae
+WORKDIR /opt/app
+CMD ["python3", "/opt/app/main.py"]
+```
+
+#### Edit `main.py`:
+Build your agent class with tools:
+```python
+import hyphae
+
+class MyApp:
+    def __init__(self):
+        self.state = {}  # Your app state
+    
+    @hyphae.tool("Description of what this tool does")
+    @hyphae.args(param="Description of parameter")
+    def MyTool(self, param: str) -> str:
+        # Your tool implementation
+        return "Tool result"
+
+if __name__ == "__main__":
+    hyphae.run(MyApp())
+```
+
+### Step 3: Add Your Icon
+```bash
+# Add a 256x256 PNG icon
+cp your-icon.png my-awesome-app/
+```
+
+### Step 4: Build and Deploy
+```bash
+# Build your app
+hyphae build .
+
+# Deploy to TruffleOS
+hyphae upload .
+```
 ## Support
 
 Join our [Discord](https://discord.gg/itsalltruffles) for developer support!
@@ -110,3 +353,6 @@ Things that are coming soon:
 - Developer logs for you to better develop and debug your app
 - hyphae init to make a template app for you saving you all the effort to copy the current template
 - Nicer cli and better logs!
+
+Happy building!
+
