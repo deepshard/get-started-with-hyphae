@@ -5,14 +5,5 @@
         "name": "Realtor",
         "description": "Realtor app",
         "icon": "icon.png"
-    },
-    "protocol_version": 0,
-    "runtime": {
-        "env": [],
-        "cwd": "/opt/realtor",
-        "cmd": [
-            "python3",
-            "/opt/realtor/main.py"
-        ]
     }
 }

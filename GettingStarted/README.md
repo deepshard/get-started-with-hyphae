@@ -45,15 +45,6 @@ Every Hyphae app starts with the same basic structure. Let's use the provided te
            "name": "Your App Name",
            "description": "Your App Description", 
            "icon": "your-icon.png"
-       },
-       "protocol_version": 0,
-       "runtime": {
-           "env": [],
-           "cwd": "/opt/your-app-name",
-           "cmd": [
-               "python3",
-               "/opt/your-app-name/main.py"
-           ]
        }
    }
    ```
@@ -61,8 +52,6 @@ Every Hyphae app starts with the same basic structure. Let's use the provided te
    **Purpose:** This file defines your app's metadata and runtime configuration. It tells Hyphae:
    - Your app's name and description (shown in the UI)
    - The icon to display
-   - Where to run your app and what command to execute
-   - Environment variables and working directory
 
    #### `Truffile` - Container Configuration
    ```dockerfile
@@ -109,15 +98,6 @@ Every Hyphae app starts with the same basic structure. Let's use the provided te
            "name": "Personal Research Assistant",
            "description": "AI-powered research assistant that helps you find, analyze, and organize information from multiple sources",
            "icon": "research-icon.png"
-       },
-       "protocol_version": 0,
-       "runtime": {
-           "env": [],
-           "cwd": "/opt/research",
-           "cmd": [
-               "python3", 
-               "/opt/research/research.py"
-           ]
        }
    }
    ```

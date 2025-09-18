@@ -1,17 +1,8 @@
 {
-    "app_uuid": "9d901afd-6b4c-468b-b631-40dfa4dac0b5",
+    "app_uuid": "",
     "metadata": {
         "name": "Research",
         "description": "research paper browsing agent",
         "icon": "research.png"
-    },
-    "protocol_version": 0,
-    "runtime": {
-        "env": [],
-        "cwd": "/opt/research",
-        "cmd": [
-            "python3",
-            "/opt/research/research.py"
-        ]
     }
 }
