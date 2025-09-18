@@ -8,16 +8,6 @@ Please read [Get Started with Truffle](https://www.notion.so/Get-Started-With-Tr
 
 If you don't have Python 3 installed on your Mac, follow [this comprehensive guide](https://docs.python-guide.org/starting/install3/osx/) to install Python 3 properly.
 
-### Create Virtual Environment and Install Hyphae
-
-Once you have Python 3 installed:
-
-```bash
-python3 -m venv myenv
-source ./myenv/bin/activate
-pip3 install hyphae
-```
-
 ## Linux Setup
 
 ```bash
@@ -35,6 +25,16 @@ pip3 install hyphae
 ```cmd
 pip install hyphae
 ```
+### Create Virtual Environment and Install Hyphae
+
+Once you have Python 3 installed:
+
+```bash
+python3 -m venv myenv
+source ./myenv/bin/activate
+pip3 install hyphae
+```
+
 
 # Building Your First Hyphae App: ArXiv Research Assistant
 
@@ -191,7 +191,7 @@ def Researcher(self, question: str, analysis_type: str = "general") -> str:
 
 ## Part 2: Building and Deploying Your App
 
-Now let's build and deploy this app so you can see it in action!
+Now let's build and deploy this app so you can see it in action! Make sure you have hyphae installed and the TruffleOS client installed before proceeding. Head to the top of the page if you have not fullfiled both these requirements.
 
 ### Step 1: Get the Code
 
@@ -247,16 +247,19 @@ This creates a `.hyphae` bundle file containing your containerized app.
 # Connect to your Truffle device
 hyphae connect
 ```
+
 Open your client and click accept. You are now connected. If it fails or the toast goes away, press `Ctrl+C` and try again.
 
 <div align="center">
   <img src="screenshots/hyphae-connect.png" alt="Hyphae Connect">
 </div>
 
-# Upload and deploy your app
+### Upload and Deploy Your App
+
 ```bash
 hyphae upload .
 ```
+
 <div align="center">
   <img src="screenshots/hyphae-upload.png" alt="Hyphae Upload">
 </div>
@@ -329,12 +332,14 @@ if __name__ == "__main__":
 ```
 
 ### Step 3: Add Your Icon
+
 ```bash
 # Add a 256x256 PNG icon
 cp your-icon.png my-awesome-app/
 ```
 
 ### Step 4: Build and Deploy
+
 ```bash
 # Build your app
 hyphae build .
@@ -342,6 +347,7 @@ hyphae build .
 # Deploy to TruffleOS
 hyphae upload .
 ```
+
 ## Support
 
 Join our [Discord](https://discord.gg/itsalltruffles) for developer support!
