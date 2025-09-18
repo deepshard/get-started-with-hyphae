@@ -131,7 +131,7 @@ Your app will start uploading. Go to your client to see a progress indicator. Fr
 
 Join our [Discord](https://discord.gg/itsalltruffles) for developer support!
 
-## Developer Note
+## Developer Notes
 
 We are working on making our cli better and adding more sdk features.
 Things that are coming soon:

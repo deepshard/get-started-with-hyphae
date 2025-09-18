@@ -31,7 +31,7 @@ Every Hyphae app starts with the same basic structure. Let's use the provided te
    cp -r GettingStarted/Template path-to-your/app-directory
    cd path-to-your/app-directory
    ```
-   open your directoey with your choice of IDE (VSCode, Cursor etc.)
+   open your directory with your choice of IDE (VSCode, Cursor etc.)
 
 2. **Understand the Template Files**
 
@@ -74,8 +74,8 @@ Every Hyphae app starts with the same basic structure. Let's use the provided te
    RUN pip3 install --no-cache-dir pandas requests tabulate feedparser 
    
    COPY main.py /opt/your-app-name/main.py
-   COPY hyphae-1.0.1-py3-none-any.whl /tmp/hyphae-1.0.1-py3-none-any.whl
-   RUN pip3 install --no-cache-dir --force-reinstall /tmp/hyphae-1.0.1-py3-none-any.whl
+ 
+   RUN pip3 install hyphae
    
    COPY *.py /opt/your-app-name
    
@@ -218,7 +218,7 @@ if __name__ == "__main__":
     hyphae.run(Research())
 ```
 
-### Understanding This Research App Foundation
+### Understanding The Research App (see [Research](./Research) for full code)
 
 Let's break down what each part does and why we made these design decisions:
 
@@ -362,14 +362,5 @@ At this point, you have a basic research app foundation that demonstrates:
 4. **Professional error handling** - Robust exception management
 5. **Extensible architecture** - Ready for additional research tools
 
-## What's Next?
-
-In the following sections, we'll add the research tools to this foundation:
-- Web search with DuckDuckGo
-- Academic paper search
-- Note-taking and organization
-- Report generation
-- News and trends analysis
-
-See examples for these tools and more apps in example_apps. Theres more coming!
+See (see [example apps](../example_apps/) for more tools and apps. Theres more coming!
 
