@@ -4,49 +4,17 @@ Please read [Get Started with Truffle](https://www.notion.so/Get-Started-With-Tr
 
 ## macOS Setup
 
-### Install Homebrew (if not already installed)
+### Install Python 3
 
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-echo >> /Users/truffle/.zprofile
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/truffle/.zprofile
-eval "$(/opt/homebrew/bin/brew shellenv)"
-```
+If you don't have Python 3 installed on your Mac, follow [this comprehensive guide](https://docs.python-guide.org/starting/install3/osx/) to install Python 3 properly.
 
-### Install Python and Setup Environment
+### Create Virtual Environment and Install Hyphae
 
-```bash
-brew install python
-```
+Once you have Python 3 installed:
 
-### Check Python Version
-
-After installing Python with Homebrew, check your Python version:
-
-```bash
-python3 --version
-which python3
-```
-
-Sometimes developer tools on Mac cause issues with python version mismatch so if the output shows an older version or points to `/usr/bin/python3` instead of `/opt/homebrew/bin/python3`, you may need to use the full path when creating your virtual environment.
-
-### Create Virtual Environment
-
-For standard setup:
 ```bash
 python3 -m venv myenv
 source ./myenv/bin/activate
-```
-
-If you encounter version conflicts, use the full Homebrew Python path:
-```bash
-/opt/homebrew/bin/python3 -m venv myenv
-source ./myenv/bin/activate
-```
-
-### Install Hyphae
-
-```bash
 pip3 install hyphae
 ```
 
