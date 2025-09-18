@@ -1,0 +1,17 @@
+{
+    "app_uuid": "c88c90a4-67a7-4e57-bf7d-3e440f5e0adb",
+    "metadata": {
+        "name": "Code",
+        "description": "An app I made",
+        "icon": "icon.png"
+    },
+    "protocol_version": 0,
+    "runtime": {
+        "env": [],
+        "cwd": "/root",
+        "cmd": [
+            "python3",
+            "/opt/app/code.py"
+        ]
+    }
+}

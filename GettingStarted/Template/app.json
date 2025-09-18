@@ -1,0 +1,18 @@
+
+{
+    "app_uuid": "",
+    "metadata": {
+        "name": "Your App Name",
+        "description": "Your App Description",
+        "icon": "your-icon.png"
+    },
+    "protocol_version": 0,
+    "runtime": {
+        "env": [],
+        "cwd": "/opt/your-app-name",
+        "cmd": [
+            "python3",
+            "/opt/your-app-name/main.py"
+        ]
+    }
+}

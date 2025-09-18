@@ -1,0 +1,17 @@
+{
+    "app_uuid": "e61e7f76-060c-443f-abe5-a48b62569e16",
+    "metadata": {
+        "name": "Arxiv",
+        "description": "Arxiv paper browsing agent",
+        "icon": "arxiv.png"
+    },
+    "protocol_version": 0,
+    "runtime": {
+        "env": [],
+        "cwd": "/opt/arxiv",
+        "cmd": [
+            "python3",
+            "/opt/arxiv/arxiv.py"
+        ]
+    }
+}

@@ -1,0 +1,14 @@
+
+FROM hyphaehyphae/alpine-python:arm64
+
+RUN pip3 install --no-cache-dir openai
+
+RUN mkdir -p /opt/app
+
+RUN pip3 install hyphae
+
+COPY *.py /opt/app
+
+WORKDIR /root
+CMD ["python3", "/opt/app/code.py"]
+

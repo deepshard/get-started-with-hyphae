@@ -1,0 +1,15 @@
+FROM hyphaehyphae/alpine-python:arm64
+
+RUN mkdir -p /opt/research
+
+RUN pip3 install --no-cache-dir ddgs python-weather pytrends pandas requests tabulate 
+
+COPY research.py /opt/research/research.py
+
+RUN pip3 install hyphae
+
+COPY *.py /opt/research
+
+
+WORKDIR /opt/research
+CMD ["python3", "/opt/research/research.py"]

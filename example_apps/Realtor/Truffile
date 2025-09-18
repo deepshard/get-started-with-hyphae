@@ -1,0 +1,16 @@
+FROM hyphaehyphae/alpine-python:arm64
+
+RUN mkdir -p /opt/realtor
+
+#example dependencies add yours here
+RUN pip3 install --no-cache-dir pandas requests tabulate feedparser 
+
+COPY main.py /opt/realtor/main.py
+
+RUN pip3 install hyphae
+
+COPY *.py /opt/realtor
+
+
+WORKDIR /opt/realtor
+CMD ["python3", "/opt/realtor/main.py"]

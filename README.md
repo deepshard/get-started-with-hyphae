@@ -70,7 +70,7 @@ pip install hyphae
 
 ## Getting Started
 
-Follow this tutorial here to make your app, join our [Discord](https://discord.gg/itsalltruffles) for more developer support!
+Follow [this tutorial here](GettingStarted/README.md) to make your app, join our [Discord](https://discord.gg/itsalltruffles) for more developer support!
 
 ## Building and Uploading your Hyphae App
 
