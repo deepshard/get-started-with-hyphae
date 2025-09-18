@@ -93,7 +93,9 @@ hyphae connect
 ```
 Open your client and click accept. You are now connected. If it fails or the toast goes away, press `Ctrl+C` and try again.
 
-![Hyphae Connect](screenshots/hyphae-connect.png)
+<div align="center">
+  <img src="screenshots/hyphae-connect.png" alt="Hyphae Connect">
+</div>
 
 
 
@@ -123,7 +125,9 @@ or
 hyphae upload your-app-dir
 ```
 
-![Hyphae Upload](screenshots/hyphae-upload.png)
+<div align="center">
+  <img src="screenshots/hyphae-upload.png" alt="Hyphae Upload">
+</div>
 
 Your app will start uploading. Go to your client to see a progress indicator. Fresh app uploading takes some time to upload, but subsequent uploads will be faster since they are cached and only update your app.
 
