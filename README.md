@@ -1,6 +1,10 @@
 # Hyphae Setup Guide
 
+Welcome to Hyphae
+
 Please read [Get Started with Truffle](https://www.notion.so/Get-Started-With-Truffle-1feca50492ab80248afae3ce41896356?source=copy_link) before continuing with this tutorial.
+
+## Prerequisites
 
 ## macOS Setup
 
@@ -38,7 +42,6 @@ pip3 install hyphae
 
 # Building Your First Hyphae App: ArXiv Research Assistant
 
-Welcome to Hyphae, the SDK for building AI agents on TruffleOS! In this tutorial, we'll walk through a complete Hyphae application, deploy it to youre turffle and at the end have you start your own app.
 ## What You'll Learn
 
 By the end of this tutorial, you'll understand:
@@ -125,7 +128,7 @@ Notice how the app creates a natural workflow:
              predicate=lambda self: self.has_paper_selected())  # Only available when paper selected
 ```
 
-**Key Concept**: Predicates create conditional tool access, guiding users through logical workflows.
+**Key Concept**: Predicates create conditional tool access, guiding agents through specific workflows.
 
 ### External API Integration
 
@@ -312,11 +315,11 @@ Join our [Discord](https://discord.gg/itsalltruffles) for developer support!
 
 ## Developer Notes
 
-We are working on making our cli better and adding more sdk features.
-Things that are coming soon:
+We are working on making our CLI better and adding more sdk features.
+Coming soon:
 - Developer logs for you to better develop and debug your app
-- hyphae init to make a template app for you saving you all the effort to copy the current template
-- Nicer cli and better logs!
+- hyphae init command to make a template starter app 
+- Integration with our VSCode extension to make the process of building, testing, and deploying apps CLI free
 
 Happy building!
 
