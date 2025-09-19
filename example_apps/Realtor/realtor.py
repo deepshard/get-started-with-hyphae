@@ -74,7 +74,7 @@ class RealtorApp:
         print("Scouting properties on Zillow...")
         
         try:
-            # RapidAPI Zillow endpoint
+            # RapidAPI Zillow endpoint, fel free to use your own
             url = "https://zillow-com1.p.rapidapi.com/propertyExtendedSearch"
             
             # Map our property types to Zillow's expected values

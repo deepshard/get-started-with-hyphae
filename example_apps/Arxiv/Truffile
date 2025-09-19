@@ -1,15 +1,11 @@
 FROM hyphaehyphae/alpine-python:arm64
 
+RUN pip3 install --no-cache-dir --force-reinstall hyphae>=1.0.0 
+RUN pip3 install --no-cache-dir ddgs python-weather pytrends pandas requests tabulate feedparser
 RUN mkdir -p /opt/arxiv
 
-RUN pip3 install --no-cache-dir ddgs python-weather pytrends pandas requests tabulate feedparser 
-
 COPY arxiv.py /opt/arxiv/arxiv.py
-
-RUN pip3 install hyphae
-
 COPY *.py /opt/arxiv
-
 
 WORKDIR /opt/arxiv
 CMD ["python3", "/opt/arxiv/arxiv.py"]

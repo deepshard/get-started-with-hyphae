@@ -38,8 +38,7 @@ pip3 install hyphae
 
 # Building Your First Hyphae App: ArXiv Research Assistant
 
-Welcome to Hyphae, the SDK for building AI agents on TruffleOS! In this tutorial, we'll walk through a complete Hyphae application to teach you the framework, then show you how to build, deploy, and use it yourself.
-
+Welcome to Hyphae, the SDK for building AI agents on TruffleOS! In this tutorial, we'll walk through a complete Hyphae application, deploy it to youre turffle and at the end have you start your own app.
 ## What You'll Learn
 
 By the end of this tutorial, you'll understand:
@@ -60,15 +59,14 @@ We'll explore an ArXiv Research Assistant that demonstrates all key Hyphae conce
 ---
 
 ## Part 1: Understanding the Code
-
-Let's start by examining a complete Hyphae app to understand how everything works. Open `example_apps/Arxiv/arxiv.py` and follow along.
+Let's start by examining a complete Hyphae app to understand how everything works. Open [`example_apps/Arxiv/arxiv.py`](example_apps/Arxiv/arxiv.py) and follow along.
 
 ### The Basics: Imports and Setup
 
 ```python
 import hyphae  # The main SDK
 from hyphae.tools.respond_to_user import RespondToUserReturnType
-from perplexity import PerplexitySearcher  # External AI service
+from perplexity import PerplexitySearcher  # see perplexity.py
 import hyphae.hooks as hooks
 ```
 
@@ -158,7 +156,8 @@ def SearchWebPapers(self, query: str) -> str:
     return PerplexitySearcher().run(search_query)  # Delegate to external AI
 ```
 
-**Key Concept**: Hyphae agents can integrate any external service. The pattern is: call API → format results → return to AI.
+See the [`AskForHelp` tool](example_apps/Code/code.py#L141-L156) in the Code app for another example of external AI service integration:
+
 
 ### AI-Powered Intelligence
 
@@ -185,13 +184,14 @@ def Researcher(self, question: str, analysis_type: str = "general") -> str:
     return PerplexitySearcher().run(researcher_prompt)
 ```
 
-**Key Concept**: Combine structured data (paper metadata) with AI reasoning to create expert-level capabilities.
+
+For more detailed comments and the complete implementation, see [`example_apps/Arxiv/arxiv.py`](example_apps/Arxiv/arxiv.py).
 
 ---
 
 ## Part 2: Building and Deploying Your App
 
-Now let's build and deploy this app so you can see it in action! Make sure you have hyphae installed and the TruffleOS client installed before proceeding. Head to the top of the page if you have not fullfiled both these requirements.
+Now let's build and deploy this app so you can see it in action! Make sure you have [hyphae installed](#create-virtual-environment-and-install-hyphae) and the [TruffleOS client installed](https://www.notion.so/Get-Started-With-Truffle-1feca50492ab80248afae3ce41896356?source=copy_link) before proceeding.
 
 ### Step 1: Get the Code
 
@@ -280,72 +280,30 @@ Now that you understand how Hyphae works, let's create your own app! We recommen
 
 ```bash
 # Create your new app directory
-mkdir my-awesome-app
-cd my-awesome-app
-
-# Copy template files
-cp -r path-to/get-started-with-hyphae/example_apps/Template/* .
+hyphae create path-to-your-app
 ```
 
 ### Step 2: Customize Your App
 
-#### Edit `app.json`:
-```json
-{
-    "app_uuid": "",
-    "metadata": {
-        "name": "My Awesome App",
-        "description": "What your app does",
-        "icon": "your-icon.png"
-    }
-}
-```
-
-#### Edit `Truffile`:
-Add your dependencies:
-```dockerfile
-FROM hyphaehyphae/alpine-python:arm64
-RUN pip3 install your-dependencies-here
-COPY main.py /opt/app/main.py
-RUN pip3 install hyphae
-WORKDIR /opt/app
-CMD ["python3", "/opt/app/main.py"]
-```
-
-#### Edit `main.py`:
-Build your agent class with tools:
-```python
-import hyphae
-
-class MyApp:
-    def __init__(self):
-        self.state = {}  # Your app state
-    
-    @hyphae.tool("Description of what this tool does")
-    @hyphae.args(param="Description of parameter")
-    def MyTool(self, param: str) -> str:
-        # Your tool implementation
-        return "Tool result"
-
-if __name__ == "__main__":
-    hyphae.run(MyApp())
-```
-
-### Step 3: Add Your Icon
-
-```bash
-# Add a 256x256 PNG icon
-cp your-icon.png my-awesome-app/
-```
+Start building!
 
 ### Step 4: Build and Deploy
 
 ```bash
 # Build your app
 hyphae build .
+```
+```bash
+hyphae build path-to-your-app
+```
 
 # Deploy to TruffleOS
+```bash
+# Build your app
 hyphae upload .
+```
+```bash
+hyphae upload path-to-your-app
 ```
 
 ## Support

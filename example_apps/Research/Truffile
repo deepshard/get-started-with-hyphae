@@ -6,7 +6,7 @@ RUN pip3 install --no-cache-dir ddgs python-weather pytrends pandas requests tab
 
 COPY research.py /opt/research/research.py
 
-RUN pip3 install hyphae
+RUN pip3 install --no-cache-dir --force-reinstall hyphae>=1.0.0 
 
 COPY *.py /opt/research
 

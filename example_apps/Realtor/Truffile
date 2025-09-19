@@ -5,12 +5,10 @@ RUN mkdir -p /opt/realtor
 #example dependencies add yours here
 RUN pip3 install --no-cache-dir pandas requests tabulate feedparser 
 
-COPY main.py /opt/realtor/main.py
-
-RUN pip3 install hyphae
-
+COPY realtor.py /opt/realtor/realtor.py
+RUN pip3 install --no-cache-dir --force-reinstall hyphae>=1.0.0 
 COPY *.py /opt/realtor
 
 
 WORKDIR /opt/realtor
-CMD ["python3", "/opt/realtor/main.py"]
+CMD ["python3", "/opt/realtor/realtor.py"]
