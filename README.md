@@ -42,24 +42,21 @@ Welcome to Hyphae, the SDK for building AI agents on TruffleOS! In this tutorial
 ## What You'll Learn
 
 By the end of this tutorial, you'll understand:
-- How Hyphae agents work and what makes them powerful
-- The core concepts: tools, state, predicates, and workflows
-- How to integrate external APIs and AI services
-- How to build, deploy, and test your own agents
-- How to create your own apps from our template
+- How Hyphae allows you to control your agent in creative ways
+- What are tools, state, and predicates
+- How to build, deploy, and test your own agentic applications
 
 ## What We'll Deploy Together
 
-We'll explore an ArXiv Research Assistant that demonstrates all key Hyphae concepts:
+We'll explore an ArXiv Research Assistant that demonstrates most Hyphae concepts, to get you started with your own application:
 - **Multi-source search**: ArXiv API, Semantic Scholar, web search
 - **Stateful workflows**: Select papers and maintain context across conversations
 - **AI-powered analysis**: Get expert insights on selected papers
-- **External integrations**: Multiple APIs and AI services working together
 
 ---
 
 ## Part 1: Understanding the Code
-Let's start by examining a complete Hyphae app to understand how everything works. Open [`example_apps/Arxiv/arxiv.py`](example_apps/Arxiv/arxiv.py) and follow along.
+Open [`example_apps/Arxiv/arxiv.py`](example_apps/Arxiv/arxiv.py) and follow along.
 
 ### The Basics: Imports and Setup
 
@@ -70,7 +67,7 @@ from perplexity import PerplexitySearcher  # see perplexity.py
 import hyphae.hooks as hooks
 ```
 
-**Key Concept**: Hyphae apps are Python classes with decorated methods that become "tools" the AI agent can use.
+**Key Concept**: Hyphae apps are Python classes with decorated methods that become "tools" your Truffle agent can use.
 
 ### Agent State and Predicates
 
@@ -85,7 +82,7 @@ class ArxivApp:
         return self.selected_paper is not None
 ```
 
-**Key Concept**: Agents maintain state across conversations. Predicate functions control when tools are available, creating natural workflows.
+**Key Concept**: Predicates control when tools are available, allowing you to have more control over your agents use of available tools.
 
 ### Tool Definitions
 
@@ -100,9 +97,9 @@ def SearchPapers(self, query: str, max_results: int = 10) -> str:
 ```
 
 **Key Concept**: 
-- `@hyphae.tool()` makes a method available to the AI agent
-- `@hyphae.args()` describes parameters so the AI knows how to use the tool
-- Tools return strings that the AI can read and use
+- `@hyphae.tool()` makes a method available to your Truffle agent
+- `@hyphae.args()` describes parameters so your agent knows how to use the tool
+- Tools return strings that your agent can read and use
 
 ### Workflow Design: Search → Select → Analyze
 
@@ -156,7 +153,7 @@ def SearchWebPapers(self, query: str) -> str:
     return PerplexitySearcher().run(search_query)  # Delegate to external AI
 ```
 
-See the [`AskForHelp` tool](example_apps/Code/code.py#L141-L156) in the Code app for another example of external AI service integration:
+See the [`AskForHelp` tool](example_apps/Code/code.py#L141-L156) in the Code app for another example of using other models for help:
 
 
 ### AI-Powered Intelligence
@@ -276,7 +273,7 @@ Once deployed, users can interact with your ArXiv Research Assistant through the
 
 Now that you understand how Hyphae works, let's create your own app! We recommend that you read through our [example apps](example_apps/) to get more context on more hyphae features.
 
-### Step 1: Copy the Template
+### Step 1: Hyphae Create!
 
 ```bash
 # Create your new app directory
@@ -315,7 +312,6 @@ Join our [Discord](https://discord.gg/itsalltruffles) for developer support!
 We are working on making our cli better and adding more sdk features.
 Things that are coming soon:
 - Developer logs for you to better develop and debug your app
-- hyphae init to make a template app for you saving you all the effort to copy the current template
 - Nicer cli and better logs!
 
 Happy building!
