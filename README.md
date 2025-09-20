@@ -6,13 +6,13 @@ Please read [Get Started with Truffle](https://www.notion.so/Get-Started-With-Tr
 
 ## Prerequisites
 
-## macOS Setup
+### macOS Setup
 
-### Install Python 3
+#### Install Python 3
 
 If you don't have Python 3 installed on your Mac, follow [this comprehensive guide](https://docs.python-guide.org/starting/install3/osx/) to install Python 3 properly.
 
-## Linux Setup
+### Linux Setup
 
 ```bash
 sudo apt update
@@ -20,7 +20,7 @@ sudo apt install -y python3 python3-pip
 pip3 install hyphae
 ```
 
-## Windows Setup
+### Windows Setup
 
 1. Download Python from: https://www.python.org/downloads/
 2. Install Python following the installer instructions
