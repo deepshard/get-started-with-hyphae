@@ -54,7 +54,7 @@ By the end of this tutorial, you'll understand:
 We'll explore an ArXiv Research Assistant that demonstrates most Hyphae concepts, to get you started with your own application:
 - **Multi-source search**: ArXiv API, Semantic Scholar, web search
 - **Stateful workflows**: Select papers and maintain context across conversations
-- **AI-powered analysis**: Get expert insights on selected papers
+- **Analysis by your Truffle agent**: Get expert insights on selected papers
 
 ---
 
@@ -110,14 +110,14 @@ Notice how the app creates a natural workflow:
 
 1. **Search Tools** (always available):
    - `SearchPapers()` - ArXiv API search
-   - `SearchWebPapers()` - Perplexity AI search
+   - `SearchWebPapers()` - Perplexity search
    - `SearchExternalPapers()` - Semantic Scholar search
 
 2. **Selection Tool** (changes agent state):
    - `SelectPaper()` - Stores paper data in `self.selected_paper`
 
 3. **Analysis Tools** (only available after selection):
-   - `Researcher()` - AI-powered paper analysis
+   - `Researcher()` - expert agent on analyzing academic papers
    - `GetCurrentPaper()` - View selected paper info
 
 ```python
@@ -149,19 +149,17 @@ def SearchExternalPapers(self, query: str, max_results: int = 10) -> str:
     # Format results...
 ```
 
-3. **External AI Service** (Perplexity):
+3. **Using external models on the cloud** (Perplexity):
 ```python
 def SearchWebPapers(self, query: str) -> str:
     search_query = f"academic papers research {query}"
-    return PerplexitySearcher().run(search_query)  # Delegate to external AI
+    return PerplexitySearcher().run(search_query)  # Delegate to external model
 ```
 
 See the [`AskForHelp` tool](example_apps/Code/code.py#L141-L156) in the Code app for another example of using other models for help:
 
+You can do cool stuff like making an expert function that you can build context for on specific things you would like! 
 
-### AI-Powered Intelligence
-
-The most sophisticated tool uses AI to provide expert analysis:
 
 ```python
 @hyphae.tool("Researcher - Discuss the selected paper with an expert")
@@ -180,7 +178,7 @@ def Researcher(self, question: str, analysis_type: str = "general") -> str:
     Answer their question: {question}
     Focus on {analysis_type} analysis."""
     
-    # Use external AI for expert response
+    # Use external model for expert response
     return PerplexitySearcher().run(researcher_prompt)
 ```
 
@@ -210,7 +208,7 @@ Your app directory contains:
     "app_uuid": "",
     "metadata": {
         "name": "Arxiv Research Assistant",
-        "description": "AI agent for searching and analyzing academic papers",
+        "description": "Truffle agent for searching and analyzing academic papers",
         "icon": "arxiv.png"
     }
 }
@@ -230,7 +228,7 @@ CMD ["python3", "/opt/arxiv/arxiv.py"]
 The Python file we just analyzed above.
 
 #### `perplexity.py` - External Service Helper
-Helper class for Perplexity AI integration.
+Helper class for Perplexity Search integration.
 
 ### Step 3: Build Your App
 
