@@ -42,22 +42,6 @@ pip3 install hyphae
 
 # Building Your First Hyphae App: ArXiv Research Assistant
 
-## What You'll Learn
-
-By the end of this tutorial, you'll understand:
-- How Hyphae allows you to control your agent in creative ways
-- What are tools, state, and predicates
-- How to build, deploy, and test your own agentic applications
-
-## What We'll Deploy Together
-
-We'll explore an ArXiv Research Assistant that demonstrates most Hyphae concepts, to get you started with your own application:
-- **Multi-source search**: ArXiv API, Semantic Scholar, web search
-- **Stateful workflows**: Select papers and maintain context across conversations
-- **Analysis by your Truffle agent**: Get expert insights on selected papers
-
----
-
 ## Part 1: Understanding the Code
 Open [`example_apps/Arxiv/arxiv.py`](example_apps/Arxiv/arxiv.py) and follow along.
 
@@ -105,8 +89,6 @@ def SearchPapers(self, query: str, max_results: int = 10) -> str:
 - Tools return strings that your agent can read and use
 
 ### Workflow Design: Search → Select → Analyze
-
-Notice how the app creates a natural workflow:
 
 1. **Search Tools** (always available):
    - `SearchPapers()` - ArXiv API search
@@ -158,8 +140,6 @@ def SearchWebPapers(self, query: str) -> str:
 
 See the [`AskForHelp` tool](example_apps/Code/code.py#L141-L156) in the Code app for another example of using other models for help:
 
-You can do cool stuff like making an expert function that you can build context for on specific things you would like! 
-
 
 ```python
 @hyphae.tool("Researcher - Discuss the selected paper with an expert")
@@ -171,7 +151,7 @@ def Researcher(self, question: str, analysis_type: str = "general") -> str:
     Abstract: {self.selected_paper['abstract']}
     """
     
-    # Create expert prompt
+    # Create research prompt
     researcher_prompt = f"""You are an expert researcher. 
     User has selected this paper: {paper_info}
     
@@ -274,7 +254,7 @@ Once deployed, users can interact with your ArXiv Research Assistant through the
 
 Now that you understand how Hyphae works, let's create your own app! We recommend that you read through our [example apps](example_apps/) to get more context on more hyphae features.
 
-### Step 1: Hyphae Create!
+### Step 1: Hyphae Create
 
 ```bash
 # Create your new app directory
@@ -310,10 +290,12 @@ Join our [Discord](https://discord.gg/itsalltruffles) for developer support!
 
 ## Developer Notes
 
-We are working on making our CLI better and adding more sdk features.
+We're currently working on some major improvements to our SDK
+
 Coming soon:
-- Developer logs for you to better develop and debug your app
+- Proper developer logs
 - Integration with our VSCode extension to make the process of building, testing, and deploying apps CLI free
+- 
 
 Happy building!
 
