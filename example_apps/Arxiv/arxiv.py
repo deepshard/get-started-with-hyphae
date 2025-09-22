@@ -20,7 +20,7 @@ class ArxivApp:
         """Check if a paper is currently selected for analysis"""
         return self.selected_paper is not None
         
-    @hyphae.tool("Search for papers on a specific topic or field. Return paper selections via respond to user. DO NOT LOOP SEARCH", icon="magnifyingglass")
+    @hyphae.tool("Search for papers on a specific topic or field. Return paper selections via respond to user. DO NOT LOOP SEARCH.", icon="magnifyingglass")
     @hyphae.args(
         query="The search query (can be a topic, keywords, or specific paper title)",
         max_results="Maximum number of results to return (default: 10)"
@@ -250,7 +250,7 @@ class ArxivApp:
 **Abstract:**
 {self.selected_paper['abstract']}
 
-**Status:** Paper is now loaded and ready for discussion. You can now use your Researcher to ask questions about this specific paper!
+**Status:** Paper is now loaded and ready for discussion. You should now use respondToUser to deliver it to the user for analysis!
 """
             
             if paper_text and "Could not extract" not in paper_text:
@@ -278,55 +278,6 @@ class ArxivApp:
                 
         except Exception as e:
             return f"Error extracting paper text: {str(e)}\nTraceback: {traceback.format_exc()}"
-    
-#     @hyphae.tool("Researcher - Discuss the selected paper with an expert", icon="graduationcap", predicate=lambda self: self.has_paper_selected())
-#     @hyphae.args(
-#         question="Your question about the selected paper",
-#         analysis_type="Type of analysis: 'general', 'technical', 'methodology', 'results', 'implications'"
-#     )
-#     def Researcher(self, question: str, analysis_type: str = "general") -> str:
-      
-        
-#         if not self.selected_paper:
-#             return "No paper selected! Please use the SelectPaper tool first to choose a paper to discuss."
-        
-#         paper_info = f"""
-# Paper: {self.selected_paper['title']}
-# Authors: {', '.join(self.selected_paper['authors'])}
-# Published: {self.selected_paper['published']}
-# Categories: {', '.join(self.selected_paper['categories'])}
-# ID: {self.selected_paper['id']}
-
-# Abstract:
-# {self.selected_paper['abstract']}
-# """
-        
-#         if self.paper_content and "Could not extract" not in self.paper_content:
-#             paper_info += f"\n\nAdditional Content:\n{self.paper_content[:2000]}..."
-        
-#         researcher_prompt = f"""You are an expert academic researcher with deep knowledge across multiple fields. A user has selected this research paper to discuss:
-
-# {paper_info}
-
-# The user is asking about this paper with a focus on {analysis_type} analysis. Please provide a thorough, educational response that:
-
-# 1. Directly addresses their question about the paper
-# 2. Provides context and background when helpful
-# 3. Explains complex concepts in an accessible way
-# 4. Relates the paper to broader research trends when relevant
-# 5. Suggests follow-up questions or areas for deeper exploration
-
-# user's question: {question}
-
-# Please respond as a knowledgeable researcher would, being both informative and encouraging."""
-
-#         try:
-#             response = PerplexitySearcher().run(researcher_prompt)
-            
-#             return f" **Researcher's Response:**\n\n{response}\n\n---\n **Current Paper:** {self.selected_paper['title']}\n **Url:** {self.selected_paper['url']}"
-            
-#         except Exception as e:
-#             return f"Error getting researcher response: {str(e)}\nTraceback: {traceback.format_exc()}"
     
     @hyphae.tool("Get information about the currently selected paper", icon="info.circle", predicate=lambda self: self.has_paper_selected())
     def GetCurrentPaper(self) -> str:
