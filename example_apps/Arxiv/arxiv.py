@@ -14,11 +14,16 @@ import traceback
 # Hyphae-specific imports for agent responses
 from hyphae.tools.respond_to_user import RespondToUserReturnType
 
-# External AI service integration - see perplexity.py for implementation
-from perplexity import PerplexitySearcher
-
 # Hyphae hooks system for customizing agent lifecycle
 import hyphae.hooks as hooks
+
+# Local module containing custom prompts and context overrides
+import prompts
+
+# HOOKS SYSTEM:
+# Override the default system context with custom prompts for this ArXiv research agent
+# This sets up specialized instructions for academic paper search and analysis
+hooks.get_initial_context = prompts.get_initial_context_override
 
 # MAIN AGENT CLASS:
 # This ArXiv research agent demonstrates academic paper search and analysis
@@ -45,10 +50,31 @@ class ArxivApp:
         """
         return self.selected_paper is not None
     
+    # CORE COMMUNICATION TOOL:
+    # This is the primary way the agent sends responses back to users
+    @hyphae.tool("Send a comprehensive response to the user with the most relevant ArXiv papers and their summaries. Include clickable links to each paper so users can easily access them. Use this to present your research findings in a well-formatted, user-friendly way.", icon="message")
+    @hyphae.args(
+        response="The response message containing relevant ArXiv papers with brief summaries, clickable links to papers, and formatted in markdown"
+    )
+    def RespondToUser(self, response: str) -> RespondToUserReturnType:
+        """
+        ARXIV-FOCUSED USER RESPONSE:
+        This tool is specifically designed for presenting ArXiv research findings.
+        The response should include:
+        - A clear answer to the user's research question
+        - List of most relevant papers with brief summaries
+        - Clickable links to ArXiv papers (both abstract and PDF links)
+        - Key insights or connections between papers
+        - Markdown formatting for readability
+        """
+        r = RespondToUserReturnType()
+        r.response = response
+        return r
+    
     # TOOL DEFINITIONS:
     # Each @hyphae.tool decorated method becomes available to the AI agent
     
-    @hyphae.tool("Search for papers on a specific topic or field", icon="magnifyingglass")
+    @hyphae.tool("Use this tool to search for papers specifc to the users query, this tool will give you a list of papers that you can attach when responding to the user, dont call this tool too often focus on narrowing your resesarch towards a response for the user", icon="magnifyingglass")
     @hyphae.args(
         query="The search query (can be a topic, keywords, or specific paper title)",
         max_results="Maximum number of results to return (default: 10)"
@@ -59,7 +85,7 @@ class ArxivApp:
         
         This tool demonstrates how to integrate external APIs with Hyphae agents.
         The ArXiv API provides free access to academic papers in physics, math,
-        computer science, and other fields.
+        computer science, and other fields. Always use this tool first to find the user some papers to start with, your response to the user should have papers fetchedf from this tool.
         
         The tool returns formatted markdown that the AI can read and present to users.
         """
@@ -128,113 +154,7 @@ class ArxivApp:
             # Graceful error handling with traceback for debugging
             return f"Error searching for papers: {str(e)}\nTraceback: {traceback.format_exc()}"
     
-    @hyphae.tool("Search web for papers on a topic using Perplexity", icon="globe")
-    @hyphae.args(query="The research topic or query to search for")
-    def SearchWebPapers(self, query: str) -> str:
-        """
-        EXTERNAL AI SERVICE INTEGRATION:
-        
-        This demonstrates how Hyphae agents can leverage external AI services.
-        Here we use Perplexity AI for broader web search beyond just ArXiv,
-        which can find papers from other repositories and provide more context.
-        """
-        search_query = f"academic papers research {query} arxiv site:arxiv.org"
-        return PerplexitySearcher().run(search_query)
-    
-    @hyphae.tool("Search for papers beyond ArXiv (Semantic Scholar)", icon="doc.plaintext")
-    @hyphae.args(
-        query="The search query (can be topic, keywords, or title)",
-        max_results="Maximum number of results to return (default: 10)",
-        offset="Offset for pagination when retrieving additional results"
-    )
-    def SearchExternalPapers(self, query: str, max_results: int = 10, offset: int = 0) -> str:
-        """
-        SEMANTIC SCHOLAR API INTEGRATION:
-        
-        This tool shows integration with another academic API - Semantic Scholar.
-        This provides access to a broader range of academic papers beyond ArXiv,
-        including papers from traditional publishers.
-        
-        Note the pagination support via offset parameter for handling large result sets.
-        """
-
-        # Prepare HTTP request with proper headers
-        headers = {
-            "User-Agent": "Mozilla/5.0 (compatible; TruffleBot/1.0; +https://truffles.ai)"
-        }
-        url = "https://api.semanticscholar.org/graph/v1/paper/search"
-
-        # Specify which fields we want from the API
-        fields = [
-            "title",
-            "authors", 
-            "year",
-            "venue",
-            "journal",
-            "externalIds",  # DOI, ArXiv ID, etc.
-            "fieldsOfStudy",
-            "url",
-            "abstract",
-            "tldr"  # AI-generated summary
-        ]
-
-        params = {
-            "query": query,
-            "limit": min(max_results, 100),  # API limit
-            "offset": offset,
-            "fields": ",".join(fields)
-        }
-
-        try:
-            response = requests.get(url, params=params, headers=headers, timeout=15)
-            response.raise_for_status()
-            data = response.json().get("data", [])
-
-            if not data:
-                return f"No external papers found for query: {query}"
-
-            # Format results similar to ArXiv search for consistency
-            results = []
-            for i, paper in enumerate(data, 1):
-                title = paper.get("title", "No title").replace("\n", " ").strip()
-                authors = [a.get("name", "Unknown") for a in paper.get("authors", [])]
-                author_str = ", ".join(authors[:3]) if authors else "Unknown"
-                if len(authors) > 3:
-                    author_str += " et al."
-
-                year = paper.get("year", "n.d.")
-                venue = paper.get("venue") or (paper.get("journal", {}).get("name") if paper.get("journal") else "")
-                venue = venue if venue else "Unknown"
-
-                url_link = paper.get("url", "")
-                external_ids = paper.get("externalIds", {})
-                doi = external_ids.get("DOI", "")
-
-                # Use abstract or AI-generated summary
-                abstract = paper.get("abstract") or paper.get("tldr", {}).get("text", "") or "No abstract available."
-
-                fields_of_study = paper.get("fieldsOfStudy", [])
-                fields_str = ", ".join(fields_of_study[:3])
-
-                info = f"""
-**{i}. {title} ({year})**
-- **Authors:** {author_str}
-- **Venue:** {venue}
-- **Fields:** {fields_str}
-- **URL:** {url_link}
-- **DOI:** {doi}
-- **Abstract:** {abstract[:300]}{'...' if len(abstract) > 300 else ''}
-
----
-"""
-                results.append(info)
-
-            return f"Found {len(data)} external papers for '{query}':\n\n" + "\n".join(results)
-
-        except Exception as e:
-            return f"Error searching external papers: {str(e)}\nTraceback: {traceback.format_exc()}"
-    
-    @hyphae.tool("Select a paper to discuss by providing its ArXiv ID", icon="doc.text")
+    @hyphae.tool("Select a paper to discuss by providing its ArXiv ID, this tool is to be used to analuyze the papers that were fetched by SearchPapers and summarize them to present it in a user friendly way when responding to the user ", icon="doc.text")
     @hyphae.args(
         arxiv_id="The ArXiv ID of the paper (e.g., '2301.12345' or 'cs.AI/0601001')",
         load_full_text="Whether to attempt to load the full paper text for deeper analysis"
@@ -352,73 +272,7 @@ class ArxivApp:
         except Exception as e:
             return f"Error extracting paper text: {str(e)}\nTraceback: {traceback.format_exc()}"
     
-    @hyphae.tool("Researcher - Discuss the selected paper with an expert", icon="graduationcap", predicate=lambda self: self.has_paper_selected())
-    @hyphae.args(
-        question="Your question about the selected paper",
-        analysis_type="Type of analysis: 'general', 'technical', 'methodology', 'results', 'implications'"
-    )
-    def Researcher(self, question: str, analysis_type: str = "general") -> str:
-        """
-        CONDITIONAL TOOL WITH AI-POWERED ANALYSIS:
-        
-        This tool demonstrates several key Hyphae concepts:
-        
-        1. PREDICATE-BASED ACCESS: Only available when a paper is selected
-        2. STATEFUL OPERATION: Uses previously stored paper data
-        3. AI-POWERED ANALYSIS: Uses external AI to provide expert-level responses
-        4. CONTEXTUAL INTELLIGENCE: Provides paper context to the AI for informed responses
-        
-        This creates an expert consultation experience where users can ask detailed
-        questions about specific papers and get informed, contextual answers.
-        """
-        
-        if not self.selected_paper:
-            return "No paper selected! Please use the SelectPaper tool first to choose a paper to discuss."
-        
-        # Prepare comprehensive paper context for the AI
-        paper_info = f"""
-Paper: {self.selected_paper['title']}
-Authors: {', '.join(self.selected_paper['authors'])}
-Published: {self.selected_paper['published']}
-Categories: {', '.join(self.selected_paper['categories'])}
-ID: {self.selected_paper['id']}
-
-Abstract:
-{self.selected_paper['abstract']}
-"""
-        
-        # Include full text content if available
-        if self.paper_content and "Could not extract" not in self.paper_content:
-            paper_info += f"\n\nAdditional Content:\n{self.paper_content[:2000]}..."
-        
-        # Create an expert researcher prompt for the AI
-        researcher_prompt = f"""You are an expert academic researcher with deep knowledge across multiple fields. A user has selected this research paper to discuss:
-
-{paper_info}
-
-The user is asking about this paper with a focus on {analysis_type} analysis. Please provide a thorough, educational response that:
-
-1. Directly addresses their question about the paper
-2. Provides context and background when helpful
-3. Explains complex concepts in an accessible way
-4. Relates the paper to broader research trends when relevant
-5. Suggests follow-up questions or areas for deeper exploration
-
-user's question: {question}
-
-Please respond as a knowledgeable researcher would, being both informative and encouraging."""
-
-        try:
-            # Use external AI service to generate expert response
-            response = PerplexitySearcher().run(researcher_prompt)
-            
-            # Format response with context
-            return f" **Researcher's Response:**\n\n{response}\n\n---\n **Current Paper:** {self.selected_paper['title']}\n **Url:** {self.selected_paper['url']}"
-            
-        except Exception as e:
-            return f"Error getting researcher response: {str(e)}\nTraceback: {traceback.format_exc()}"
-    
-    @hyphae.tool("Get information about the currently selected paper", icon="info.circle", predicate=lambda self: self.has_paper_selected())
+    @hyphae.tool("Get information about the currently selected paper, use this tool to get information about the paper that you have selected", icon="info.circle", predicate=lambda self: self.has_paper_selected())
     def GetCurrentPaper(self) -> str:
         """
         STATE QUERY TOOL:
