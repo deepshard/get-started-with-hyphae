@@ -1,17 +1,12 @@
-# Hyphae is the main SDK for building TruffleOS agentic applications
 import hyphae
-
-# Standard libraries for HTTP requests and XML/JSON parsing
 import requests
 import xml.etree.ElementTree as ET
 from typing import List, Dict, Optional
 import re
 from urllib.parse import quote
-import feedparser  # For parsing Atom/RSS feeds from ArXiv API
+import feedparser
 import time
 import traceback
-
-# Hyphae-specific imports for agent responses
 from hyphae.tools.respond_to_user import RespondToUserReturnType
 
 # Hyphae hooks system for customizing agent lifecycle
@@ -30,15 +25,8 @@ hooks.get_initial_context = prompts.get_initial_context_override
 # It shows patterns for integrating external APIs and maintaining state across tool calls
 class ArxivApp:
     def __init__(self):
-        """
-        AGENT STATE INITIALIZATION:
-        
-        Hyphae agents maintain state across tool calls within a conversation.
-        This allows the agent to "remember" which paper is selected and provide
-        contextual follow-up capabilities.
-        """
-        self.selected_paper = None    # Currently selected paper metadata
-        self.paper_content = None     # Full text content (when available)
+        self.selected_paper = None
+        self.paper_content = None
         
     def has_paper_selected(self) -> bool:
         """
@@ -91,49 +79,47 @@ class ArxivApp:
         """
         # ArXiv API search - uses their REST API with Atom feed responses
         base_url = "http://export.arxiv.org/api/query"
-        search_query = f"search_query=all:{quote(query)}"  # URL encode the query
+        search_query = f"search_query=all:{quote(query)}"
         params = f"{search_query}&start=0&max_results={max_results}&sortBy=relevance&sortOrder=descending"
         
         url = f"{base_url}?{params}"
         
         try:
             response = requests.get(url)
-            response.raise_for_status()  # Raise exception for HTTP errors
+            response.raise_for_status()
             
-            # Parse the Atom feed response using feedparser
+            # Parse the Atom feed
             feed = feedparser.parse(response.content)
             
             if not feed.entries:
                 return f"No papers found for query: {query}"
             
-            # Format results as markdown for easy reading
             results = []
             for i, entry in enumerate(feed.entries, 1):
-                # Extract and clean paper metadata
+                # Extract information
                 title = entry.title.replace('\n', ' ').strip()
                 authors = [author.name for author in entry.authors] if hasattr(entry, 'authors') else []
                 author_str = ", ".join(authors[:3])  # Show first 3 authors
                 if len(authors) > 3:
                     author_str += " et al."
                 
-                # Extract ArXiv ID from the entry link for later reference
+                # Extract ArXiv ID from the entry link
                 arxiv_id = entry.id.split('/')[-1]
                 arxiv_url = f"https://arxiv.org/abs/{arxiv_id}"
                 pdf_url = f"https://arxiv.org/pdf/{arxiv_id}.pdf"
                 
-                # Extract and truncate abstract
+                # Extract abstract
                 summary = entry.summary.replace('\n', ' ').strip()
                 
-                # Extract publication date
+                # Extract published date
                 published = entry.published[:10] if hasattr(entry, 'published') else "Unknown"
                 
-                # Extract subject categories
+                # Extract categories
                 categories = []
                 if hasattr(entry, 'tags'):
                     categories = [tag.term for tag in entry.tags]
                 category_str = ", ".join(categories[:3])
                 
-                # Format as structured markdown
                 paper_info = f"""
 **{i}. {title}**
 - **Authors:** {author_str}
@@ -151,7 +137,6 @@ class ArxivApp:
             return f"Found {len(feed.entries)} papers for '{query}':\n\n" + "\n".join(results)
             
         except Exception as e:
-            # Graceful error handling with traceback for debugging
             return f"Error searching for papers: {str(e)}\nTraceback: {traceback.format_exc()}"
     
     @hyphae.tool("Select a paper to discuss by providing its ArXiv ID, this tool is to be used to analuyze the papers that were fetched by SearchPapers and summarize them to present it in a user friendly way when responding to the user ", icon="doc.text")
@@ -160,25 +145,17 @@ class ArxivApp:
         load_full_text="Whether to attempt to load the full paper text for deeper analysis"
     )
     def SelectPaper(self, arxiv_id: str, load_full_text: bool = True) -> str:
-        """
-        STATEFUL WORKFLOW TOOL:
+        """Select a paper for discussion and load its content"""
         
-        This tool demonstrates how agents can maintain state and create workflows.
-        By selecting a paper, we store its metadata in the agent's state, which
-        then enables other tools (like Researcher) that work with the selected paper.
-        
-        This creates a natural workflow: search → select → analyze.
-        """
-        
-        # Clean and normalize the ArXiv ID
+        # Clean the ArXiv ID
         arxiv_id = arxiv_id.strip()
         if arxiv_id.startswith('http'):
-            # Extract ID from URL if user provides full ArXiv URL
+            # Extract ID from URL
             arxiv_id = arxiv_id.split('/')[-1]
             arxiv_id = arxiv_id.replace('.pdf', '')
         
         try:
-            # Get paper metadata from ArXiv API
+            # Get paper metadata
             base_url = "http://export.arxiv.org/api/query"
             search_query = f"id_list={arxiv_id}"
             url = f"{base_url}?{search_query}"
@@ -193,8 +170,7 @@ class ArxivApp:
             
             entry = feed.entries[0]
             
-            # Store paper information in agent state
-            # This is the key to stateful agent behavior
+            # Store paper information
             self.selected_paper = {
                 'id': arxiv_id,
                 'title': entry.title.replace('\n', ' ').strip(),
@@ -215,7 +191,7 @@ class ArxivApp:
                 except Exception as e:
                     paper_text = f"Could not extract full text: {str(e)}"
             
-            # Format response showing successful selection
+            # Format response
             authors_str = ", ".join(self.selected_paper['authors'][:3])
             if len(self.selected_paper['authors']) > 3:
                 authors_str += " et al."
@@ -233,7 +209,7 @@ class ArxivApp:
 **Abstract:**
 {self.selected_paper['abstract']}
 
-**Status:** Paper is now loaded and ready for discussion. You can now use your Researcher to ask questions about this specific paper!
+**Status:** Paper is now loaded and ready for discussion. You should now use respondToUser to deliver it to the user for analysis!
 """
             
             if paper_text and "Could not extract" not in paper_text:
@@ -247,15 +223,7 @@ class ArxivApp:
             return f"Error selecting paper: {str(e)}\nTraceback: {traceback.format_exc()}"
     
     def _extract_paper_text(self, arxiv_id: str) -> str:
-        """
-        HELPER METHOD (NOT A TOOL):
-        
-        Methods without @hyphae.tool decorators are not exposed to the AI agent.
-        They serve as internal helper functions that tools can call.
-        
-        This method attempts to extract paper content for deeper analysis.
-        In a production system, this might use PDF parsing libraries.
-        """
+
         try:
             abs_url = f"https://arxiv.org/abs/{arxiv_id}"
             response = requests.get(abs_url)
@@ -263,8 +231,6 @@ class ArxivApp:
             if response.status_code == 200:
                 content = response.text
                 
-                # In this example, we just note that the page was loaded
-                # A full implementation might parse the PDF or extract more content
                 return f"Paper abstract page loaded. For full text analysis, the abstract and metadata provide substantial information for discussion."
             else:
                 return "Could not access paper content"
@@ -274,15 +240,6 @@ class ArxivApp:
     
     @hyphae.tool("Get information about the currently selected paper, use this tool to get information about the paper that you have selected", icon="info.circle", predicate=lambda self: self.has_paper_selected())
     def GetCurrentPaper(self) -> str:
-        """
-        STATE QUERY TOOL:
-        
-        This tool allows users to check what paper is currently selected.
-        It demonstrates how agents can provide information about their internal state.
-        
-        This is useful in conversational interfaces where users might forget
-        what they were working on or want to confirm the current context.
-        """
         
         if not self.selected_paper:
             return "No paper is currently selected. Use SearchPapers to find papers, then SelectPaper to choose one."
@@ -307,28 +264,9 @@ class ArxivApp:
 """
 
 def on_app_start(instance: ArxivApp):
-    """
-    APP LIFECYCLE HOOK:
-    
-    This function is called when the agent application starts up.
-    Used for any initialization that needs to happen after the agent is created.
-    
-    In this case, we just log that the app is starting, but this could be used for:
-    - Loading configuration
-    - Initializing external connections
-    - Setting up caches or databases
-    - Performing health checks
-    """
     print("ArxivApp starting")
 
-# HOOKS REGISTRATION:
-# Register our startup hook with the Hyphae system
 hooks.on_app_start = on_app_start
 
-# MAIN EXECUTION:
-# Standard Hyphae app entry point
 if __name__ == "__main__":
-    # hyphae.run() starts the agent runtime with our ArxivApp class instance
-    # This creates a gRPC server that TruffleOS can communicate with
-    # The agent becomes available for users to interact with through the TruffleOS interface
     hyphae.run(ArxivApp())
