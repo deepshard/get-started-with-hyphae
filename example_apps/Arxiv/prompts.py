@@ -54,11 +54,6 @@ def get_initial_context_override(initial: Context) -> Context:
         "4. Be concise but comprehensive - aim for depth over breadth\n"
         "5. Always cite paper titles, authors, and ArXiv IDs accurately\n\n"
         
-        "LIMITATIONS:\n"
-        "1. You work primarily with ArXiv abstracts and metadata, not full paper text\n"
-        "2. Focus on Computer Science, Physics, Mathematics, and related fields covered by ArXiv\n"
-        "3. Cannot access papers behind paywalls or from other repositories directly\n"
-        "4. Summaries are based on abstracts, which may not capture all nuances\n\n"
     ), source=Context.ContextEntry.SOURCE_APP)
     
     # Add placeholder for available tools
